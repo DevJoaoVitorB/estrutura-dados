@@ -10,12 +10,9 @@ public class GenericTree<T> implements Tree<T, GenericNode<T>> {
 
     private GenericNode<T> root;
 
-    public GenericTree(T element) { 
-        root = new GenericNode<>(element);
-    }
+    public GenericTree(T element) { root = new GenericNode<>(element, null); }
 
     // Generic Methods
-    @Override
     public int size() { return size(root); }
     public int size(GenericNode<T> node) {
         if (node == null) return 0;
@@ -70,8 +67,7 @@ public class GenericTree<T> implements Tree<T, GenericNode<T>> {
 
     // Update Methods
     public void addChild(GenericNode<T> parent, T newElement) {
-        GenericNode<T> newChild = new GenericNode<T>(newElement);
-        newChild.setParent(parent);
+        GenericNode<T> newChild = new GenericNode<>(newElement, parent);
         parent.addChild(newChild);
     }
 
@@ -99,7 +95,6 @@ public class GenericTree<T> implements Tree<T, GenericNode<T>> {
     }
 
     // Traversal Methods
-    @Override
     public void preOrder() { preOrder(root); }
     private void preOrder(GenericNode<T> node) {
         if (node == null) return;
@@ -109,7 +104,6 @@ public class GenericTree<T> implements Tree<T, GenericNode<T>> {
         while (iterator.hasNext()) preOrder(iterator.next());
     }
 
-    @Override
     public void postOrder() { postOrder(root); }
     private void postOrder(GenericNode<T> node) {
         if (node == null) return;

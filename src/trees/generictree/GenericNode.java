@@ -10,8 +10,8 @@ public class GenericNode<T> extends AbstractNode<T, GenericNode<T>> {
 
     private List<GenericNode<T>> children;
 
-    public GenericNode(T element) {
-        super(element);
+    public GenericNode(T element, GenericNode<T> parent) {
+        super(element, parent);
         children = new ArrayList<>();
     }
 

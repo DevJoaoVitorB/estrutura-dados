@@ -4,7 +4,10 @@ public abstract class AbstractNode<T, N extends AbstractNode<T, N>> {
     private T element;
     private N parent;
 
-    public AbstractNode(T element) { this.element = element; }
+    public AbstractNode(T element, N parent) { 
+        this.element = element; 
+        this.parent = parent;
+    }
 
     // Get and Set Methods
     public T getElement() { return element; }
