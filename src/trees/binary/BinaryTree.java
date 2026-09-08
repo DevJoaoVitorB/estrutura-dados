@@ -102,6 +102,13 @@ public abstract class BinaryTree<
         System.out.print(node.getElement() + " ");
     }
 
+    // Hooks
+    protected abstract N createNode(T element, N parent);
+
+    protected void rebalanceInsert(N parent, boolean wasLeftChild) { return; }
+    
+    protected void rebalanceRemove(N parent, boolean wasLeftChild) { return; }
+
     // Print Tree
     public void printTree() {
         N root = getRoot();
@@ -168,9 +175,7 @@ public abstract class BinaryTree<
         N child = node.getLeftChild() != null ? node.getLeftChild() : node.getRightChild();
         N parent = node.getParent();
 
-        if (parent == null) setRoot(child);
-        else if (parent.getLeftChild() == node) parent.setLeftChild(child);
-        else parent.setRightChild(child);
+        replaceInParent(node, child);
 
         if (parent == null && child != null) child.setParent(null);
         boolean wasLeftChild = parent != null && parent.getLeftChild() == node;
@@ -178,10 +183,15 @@ public abstract class BinaryTree<
         rebalanceRemove(parent, wasLeftChild);
     }
 
-    protected abstract N createNode(T element, N parent);
+    protected void replaceInParent(N node, N replacement) {
+        N parent = node.getParent();
 
-    protected void rebalanceInsert(N parent, boolean wasLeftChild) { return; }
-    protected void rebalanceRemove(N parent, boolean wasLeftChild) { return; }
+        if (parent == null) setRoot(replacement);
+        else if (parent.getLeftChild() == node) parent.setLeftChild(replacement);
+        else parent.setRightChild(replacement);
+
+        if (parent == null && replacement != null) replacement.setParent(null);
+    }
 
     protected String nodeLabel(N node) { return node.getElement().toString(); }
 }
