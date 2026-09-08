@@ -61,20 +61,35 @@ public abstract class BinaryTree<
     }
 
     // Update Methods
-    public void insert(T element) {  
+    public void insert(T element) {
         if (getRoot() == null) {
             setRoot(createNode(element, null));
             return;
         }
 
-        insertOperation(getRoot(), element); 
+        System.out.println("\n=== BEFORE INSERTING %s ===\n".formatted(element.toString()));
+        printTree();
+
+        insertOperation(getRoot(), element);
+
+        System.out.println("\n=== AFTER INSERTING %s ===\n".formatted(element.toString()));
+        printTree();
     }
 
     public void remove(T key) {
         N node = find(key);
-        if (node == null) return;
+        if (node == null) { 
+            System.out.println("Element not found.");
+            return;
+        }
 
-        removeOperation(node); 
+        System.out.println("\n=== BEFORE REMOVING %s ===\n".formatted(key.toString()));
+        printTree();
+
+        removeOperation(node);
+        
+        System.out.println("\n=== AFTER REMOVING %s ===\n".formatted(key.toString()));
+        printTree();
     }
 
     // Traversal Methods
@@ -113,7 +128,7 @@ public abstract class BinaryTree<
     public void printTree() {
         N root = getRoot();
         int height = height(root);
-        int width = (int) Math.pow(2, height + 2);
+        int width = (int) Math.pow(2, height + 2) * 2;
         List<StringBuilder> lines = new ArrayList<>();
         for (int i = 0; i <= height; i++) lines.add(new StringBuilder(" ".repeat(width)));
         printTree(root, lines, 0, width / 2, width / 4);
@@ -155,7 +170,7 @@ public abstract class BinaryTree<
             return;
         }
         
-        N newNode = createNode(element, child);
+        N newNode = createNode(element, node);
         if (goLeft) node.setLeftChild(newNode);
         else node.setRightChild(newNode);
 
@@ -174,12 +189,9 @@ public abstract class BinaryTree<
         
         N child = node.getLeftChild() != null ? node.getLeftChild() : node.getRightChild();
         N parent = node.getParent();
-
-        replaceInParent(node, child);
-
-        if (parent == null && child != null) child.setParent(null);
         boolean wasLeftChild = parent != null && parent.getLeftChild() == node;
 
+        replaceInParent(node, child);
         rebalanceRemove(parent, wasLeftChild);
     }
 
