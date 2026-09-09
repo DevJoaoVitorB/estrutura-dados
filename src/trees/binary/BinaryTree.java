@@ -49,7 +49,7 @@ public abstract class BinaryTree<
     }
 
     public int depth(N node) {
-        if (isRoot(node)) return 0;
+        if (isRoot(node) || node == null) return 0;
         return 1 + depth(node.getParent());
     }
 
@@ -67,12 +67,12 @@ public abstract class BinaryTree<
             return;
         }
 
-        System.out.println("\n=== BEFORE INSERTING %s ===\n".formatted(element.toString()));
+        System.out.println("\n=== Before Inserting %s ===\n".formatted(element.toString()));
         printTree();
 
         insertOperation(getRoot(), element);
 
-        System.out.println("\n=== AFTER INSERTING %s ===\n".formatted(element.toString()));
+        System.out.println("\n=== After Inserting %s ===\n".formatted(element.toString()));
         printTree();
     }
 
@@ -83,12 +83,12 @@ public abstract class BinaryTree<
             return;
         }
 
-        System.out.println("\n=== BEFORE REMOVING %s ===\n".formatted(key.toString()));
+        System.out.println("\n=== Before Removing %s ===\n".formatted(key.toString()));
         printTree();
 
         removeOperation(node);
         
-        System.out.println("\n=== AFTER REMOVING %s ===\n".formatted(key.toString()));
+        System.out.println("\n=== After Removing %s ===\n".formatted(key.toString()));
         printTree();
     }
 
@@ -120,9 +120,9 @@ public abstract class BinaryTree<
     // Hooks
     protected abstract N createNode(T element, N parent);
 
-    protected void rebalanceInsert(N parent, boolean wasLeftChild) { return; }
+    protected void updateAfterInsert(N parent, boolean wasLeftChild) { return; }
     
-    protected void rebalanceRemove(N parent, boolean wasLeftChild) { return; }
+    protected void updateAfterRemove(N parent, boolean wasLeftChild) { return; }
 
     // Print Tree
     public void printTree() {
@@ -174,7 +174,7 @@ public abstract class BinaryTree<
         if (goLeft) node.setLeftChild(newNode);
         else node.setRightChild(newNode);
 
-        rebalanceInsert(node, goLeft);
+        updateAfterInsert(node, goLeft);
     }
 
     private void removeOperation(N node) {
@@ -192,7 +192,7 @@ public abstract class BinaryTree<
         boolean wasLeftChild = parent != null && parent.getLeftChild() == node;
 
         replaceInParent(node, child);
-        rebalanceRemove(parent, wasLeftChild);
+        updateAfterRemove(parent, wasLeftChild);
     }
 
     protected void replaceInParent(N node, N replacement) {

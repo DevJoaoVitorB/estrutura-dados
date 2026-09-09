@@ -11,7 +11,7 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
     }
 
     @Override
-    protected void rebalanceInsert(AVLNode<T> parent, boolean wasLeftChild) {
+    protected void updateAfterInsert(AVLNode<T> parent, boolean wasLeftChild) {
         AVLNode<T> current = parent;
         boolean isLeftChild = wasLeftChild;
 
@@ -20,24 +20,9 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
             int factor = current.getBalanceFactor();
 
             if (factor == 0) return;
-
-            if (factor > 1) {
-                System.out.println("\n=== TREE UNBALANCED AT %s ===\n".formatted(current.getElement().toString()));
-                printTree();
-
-                AVLNode<T> left = current.getLeftChild();
-                if (left.getBalanceFactor() < 0) rotateLeft(left);
-                rotateRight(current);
-                return;
-            }
-
-            if (factor < -1) {
-                System.out.println("\n=== TREE UNBALANCED AT %s ===\n".formatted(current.getElement().toString()));
-                printTree();
-                
-                AVLNode<T> right = current.getRightChild();
-                if (right.getBalanceFactor() > 0) rotateRight(right);
-                rotateLeft(current);
+            
+            if (factor > 1 || factor < -1) {
+                rebalance(current, factor);
                 return;
             }
 
@@ -51,7 +36,7 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
     }
 
     @Override
-    protected void rebalanceRemove(AVLNode<T> parent, boolean wasLeftChild) {
+    protected void updateAfterRemove(AVLNode<T> parent, boolean wasLeftChild) {
         AVLNode<T> current = parent;
         boolean isLeftChild = wasLeftChild;
 
@@ -61,32 +46,37 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
             
             if (factor != 0) return;
 
-            if (factor > 1) {
-                System.out.println("\n=== TREE UNBALANCED AT %s ===\n".formatted(current.getElement().toString()));
-                printTree();
-
-                AVLNode<T> left = current.getLeftChild();
-                if (left.getBalanceFactor() < 0) rotateLeft(left);
-                rotateRight(current);
-                return;
-            }
-
-            if (factor < -1) {
-                System.out.println("\n=== TREE UNBALANCED AT %s ===\n".formatted(current.getElement().toString()));
-                printTree();
-
-                AVLNode<T> right = current.getRightChild();
-                if (right.getBalanceFactor() > 0) rotateRight(right);
-                rotateLeft(current);
+            if (factor > 1 || factor < -1) {
+                rebalance(current, factor);
                 return;
             }
 
             AVLNode<T> next = current.getParent();
-
             if (next == null) return;
-
             isLeftChild = next.getLeftChild() == current;
             current = next;
+        }
+    }
+
+    private void rebalance(AVLNode<T> node, int factor) {
+        if (factor > 1) {
+            System.out.println("\n=== Tree Unbalanced At %s ===\n".formatted(node.getElement().toString()));
+            printTree();
+
+            AVLNode<T> left = node.getLeftChild();
+            if (left.getBalanceFactor() < 0) rotateLeft(left);
+            rotateRight(node);
+            return;
+        }
+
+        if (factor < -1) {
+            System.out.println("\n=== Tree Unbalanced At %s ===\n".formatted(node.getElement().toString()));
+            printTree();
+
+            AVLNode<T> right = node.getRightChild();
+            if (right.getBalanceFactor() > 0) rotateRight(right);
+            rotateLeft(node);
+            return;
         }
     }
 
@@ -101,7 +91,7 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
         updateBalanceFactor(node);
         updateBalanceFactor(rightChild);
 
-        System.out.println("\n=== TREE AFTER LEFT ROTATION ===\n");
+        System.out.println("\n=== Tree After Left Rotation ===\n");
         printTree();
     }
 
@@ -115,7 +105,7 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
         updateBalanceFactor(node);
         updateBalanceFactor(leftChild);
 
-        System.out.println("\n=== TREE AFTER RIGHT ROTATION ===\n");
+        System.out.println("\n=== Tree After Right Rotation ===\n");
         printTree();
     }
 
