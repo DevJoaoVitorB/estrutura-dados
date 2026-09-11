@@ -88,8 +88,8 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
         replaceInParent(node, rightChild);
         rightChild.setLeftChild(node);
 
-        updateBalanceFactor(node);
-        updateBalanceFactor(rightChild);
+        node.setBalanceFactor(node.getBalanceFactor() + 1 - Math.min(rightChild.getBalanceFactor(), 0));
+        rightChild.setBalanceFactor(rightChild.getBalanceFactor() + 1 + Math.max(node.getBalanceFactor(), 0));
 
         System.out.println("\n=== Tree After Left Rotation ===\n");
         printTree();
@@ -102,15 +102,11 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
         replaceInParent(node, leftChild);
         leftChild.setRightChild(node);
 
-        updateBalanceFactor(node);
-        updateBalanceFactor(leftChild);
+        node.setBalanceFactor(node.getBalanceFactor() - 1 - Math.max(leftChild.getBalanceFactor(), 0));
+        leftChild.setBalanceFactor(leftChild.getBalanceFactor() - 1 + Math.min(node.getBalanceFactor(), 0));
 
         System.out.println("\n=== Tree After Right Rotation ===\n");
         printTree();
-    }
-
-    private void updateBalanceFactor(AVLNode<T> node) {
-        node.setBalanceFactor(height(node.getLeftChild()) - height(node.getRightChild()));
     }
     
     @Override
