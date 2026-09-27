@@ -205,5 +205,17 @@ public abstract class BinaryTree<
         if (parent == null && replacement != null) replacement.setParent(null);
     }
 
+    protected void rotateLeft(N node, N rightChild) {
+        node.setRightChild(rightChild.getLeftChild());
+        replaceInParent(node, rightChild);
+        rightChild.setLeftChild(node);
+    }
+
+    protected void rotateRight(N node, N leftChild) {
+        node.setLeftChild(leftChild.getRightChild());
+        replaceInParent(node, leftChild);
+        leftChild.setRightChild(node);
+    }
+
     protected String nodeLabel(N node) { return node.getElement().toString(); }
 }
