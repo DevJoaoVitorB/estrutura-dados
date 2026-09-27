@@ -86,7 +86,7 @@ public abstract class BinaryTree<
         System.out.println("\n=== Before Removing %s ===\n".formatted(key.toString()));
         printTree();
 
-        removeOperation(node);
+        removeOperation(node, null);
         
         System.out.println("\n=== After Removing %s ===\n".formatted(key.toString()));
         printTree();
@@ -122,7 +122,7 @@ public abstract class BinaryTree<
 
     protected void updateAfterInsert(N parent, boolean wasLeftChild) { return; }
     
-    protected void updateAfterRemove(N parent, boolean wasLeftChild) { return; }
+    protected void updateAfterRemove(N removedNode, N parent, boolean wasLeftChild, N realNode) { return; }
 
     // Print Tree
     public void printTree() {
@@ -177,22 +177,23 @@ public abstract class BinaryTree<
         updateAfterInsert(node, goLeft);
     }
 
-    private void removeOperation(N node) {
-        if (node.getLeftChild() != null && node.getRightChild() != null) {
-            N successor = node.getRightChild();
+    // OBS.: RealNode - Node whose key will be replaced by its successor's key
+    private void removeOperation(N nodeToRemove, N realNode) {
+        if (nodeToRemove.getLeftChild() != null && nodeToRemove.getRightChild() != null) {
+            N successor = nodeToRemove.getRightChild();
             while (successor.getLeftChild() != null) successor = successor.getLeftChild();
 
-            node.setElement(successor.getElement());
-            removeOperation(successor);
+            nodeToRemove.setElement(successor.getElement());
+            removeOperation(successor, nodeToRemove);
             return;
         }
         
-        N child = node.getLeftChild() != null ? node.getLeftChild() : node.getRightChild();
-        N parent = node.getParent();
-        boolean wasLeftChild = parent != null && parent.getLeftChild() == node;
+        N child = nodeToRemove.getLeftChild() != null ? nodeToRemove.getLeftChild() : nodeToRemove.getRightChild();
+        N parent = nodeToRemove.getParent();
+        boolean wasLeftChild = parent != null && parent.getLeftChild() == nodeToRemove;
 
-        replaceInParent(node, child);
-        updateAfterRemove(parent, wasLeftChild);
+        replaceInParent(nodeToRemove, child);
+        updateAfterRemove(nodeToRemove, parent, wasLeftChild, realNode);
     }
 
     protected void replaceInParent(N node, N replacement) {

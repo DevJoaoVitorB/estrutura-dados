@@ -35,8 +35,8 @@ public class AVLTree<T extends Comparable<T>> extends BinaryTree<T, AVLNode<T>> 
         }
     }
 
-    @Override
-    protected void updateAfterRemove(AVLNode<T> parent, boolean wasLeftChild) {
+    @Override 
+    protected void updateAfterRemove(AVLNode<T> removedNode, AVLNode<T> parent, boolean wasLeftChild, AVLNode<T> realNode) {
         AVLNode<T> current = parent;
         boolean isLeftChild = wasLeftChild;
 

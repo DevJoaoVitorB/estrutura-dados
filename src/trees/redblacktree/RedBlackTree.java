@@ -15,14 +15,14 @@ public class RedBlackTree<T extends Comparable<T>> extends BinaryTree<T, RedBlac
         if (parent == null) { return; }
 
         // Case 1 - Parent is BLACK - OK!
-        if (parent.getColor() == Color.BLACK) { return; }
+        if (isBlack(parent)) { return; }
 
         // Grandfather and Uncle
         RedBlackNode<T> grandfather = parent.getParent();
         RedBlackNode<T> uncle = grandfather.getLeftChild() == parent ? grandfather.getRightChild() : grandfather.getLeftChild();
 
         // Case 2 - Parent and Uncle are Red - Paint Parent and Uncle Black, and Grandfather Red
-        if (uncle != null && uncle.getColor() == Color.RED) {
+        if (isRed(uncle)) {
             parent.setColor(Color.BLACK);
             uncle.setColor(Color.BLACK);
             grandfather.setColor(Color.RED);
@@ -36,9 +36,6 @@ public class RedBlackTree<T extends Comparable<T>> extends BinaryTree<T, RedBlac
         // Case 3 - Parent is Red, Uncle and Grandfather are Black - Rotate
         // Inserted Node
         RedBlackNode<T> insertedNode = wasLeftChild ? parent.getLeftChild() : parent.getRightChild();
-
-        System.out.println("\n=== Tree Unbalanced At %s ===\n".formatted(insertedNode.getElement().toString()));
-        printTree();
 
         // Case 3a - Left Simple Rotate
         if (!wasLeftChild && grandfather.getRightChild() == parent) {
@@ -75,9 +72,105 @@ public class RedBlackTree<T extends Comparable<T>> extends BinaryTree<T, RedBlac
     }
 
     @Override 
-    protected void updateAfterRemove(RedBlackNode<T> parent, boolean wasLeftChild) {}
+    protected void updateAfterRemove(RedBlackNode<T> removedNode, RedBlackNode<T> parent, boolean wasLeftChild, RedBlackNode<T> realNode) {
+        /*
+            * removedNode - Node physically removed from the tree (Can be the Successor). (X)
+            * realNode    - Actual node whose key is replaced. (V)
+        */
+
+        // Situation 1 - Removed and Real Nodes are Red - OK!
+        if (isRed(removedNode, realNode)) { return; }
+
+        // Situation 2 - Removed Node is Red and Real Node is Black - Paint the Real Node Black
+        if (isRed(removedNode) && isBlack(realNode)) { realNode.setColor(Color.BLACK); return; }
+
+        // Situation 4 - Removed Node is Black and Real Node is Red - Paint the Real Node Red
+        if (isBlack(removedNode) && isRed(realNode)) { realNode.setColor(Color.RED); }
+
+        // Situation 3 - Removed and Real Node are Black
+        RedBlackNode<T> current = parent;
+        boolean isLeftChild = wasLeftChild;
+
+        while(current != null) {
+            RedBlackNode<T> brother = isLeftChild ? current.getRightChild() : current.getLeftChild();
+
+            if (brother == null) { current = current.getParent(); continue; }
+
+            // Removed Node's Nephews Near and Far
+            RedBlackNode<T> nearNephew = isLeftChild 
+                ? brother.getLeftChild() 
+                : brother.getRightChild();
+            RedBlackNode<T> farNephew = isLeftChild
+                ? brother.getRightChild()
+                : brother.getLeftChild();
+
+             // Case 2b - Brother and Nephews are Black, Parent is Red
+            if (isRed(current) && isBlack(removedNode, brother, nearNephew, farNephew)) {
+                brother.setColor(Color.RED);
+                current.setColor(Color.BLACK);
+                return;
+            }
+
+            // Case 4 - Brother is Black and Right Nephew Red
+            if (isBlack(removedNode, brother) && isRed(farNephew)) {
+                Color parentColor = current.getColor();
+                
+                if (brother == current.getLeftChild()) rotateRight(current);
+                else rotateLeft(current);
+
+                brother.setColor(parentColor);
+                current.setColor(Color.BLACK);
+                farNephew.setColor(Color.BLACK);
+                return;
+            }
+            
+            // Case 1 - Brother is Red and Parent is Black
+            if (isBlack(removedNode, current) && isRed(brother)) {
+                if (brother == current.getLeftChild()) rotateRight(current);
+                else rotateLeft(current);
+
+                brother.setColor(Color.BLACK);
+                current.setColor(Color.RED);
+                continue;
+            }
+
+            // Case 2a - Family are Black
+            if (isBlack(current, removedNode, brother, nearNephew, farNephew)) {
+                brother.setColor(Color.RED);
+
+                RedBlackNode<T> oldCurrent = current;
+                current = current.getParent();
+                if (current != null) isLeftChild = current.getLeftChild() == oldCurrent;
+
+                continue;
+            }
+
+            // Case 3 - Brothers Black, Left Nephew Red and Right Nephew Black
+            if (isBlack(removedNode, brother, farNephew) && isRed(nearNephew)) {
+                if (nearNephew == brother.getLeftChild()) rotateRight(brother);
+                else rotateLeft(brother);
+
+                brother.setColor(Color.RED);
+                nearNephew.setColor(Color.BLACK);
+
+                continue;
+            }
+        }
+    }
 
     // Helpers
+    @SafeVarargs
+    private boolean isBlack(RedBlackNode<T>... nodes) {
+        for (RedBlackNode<T> node : nodes) { if (node != null && node.getColor() == Color.RED) return false; }
+        return true;
+    }
+
+    @SafeVarargs
+    private boolean isRed(RedBlackNode<T>... nodes) {
+        for (RedBlackNode<T> node : nodes) { if (node == null || node.getColor() == Color.BLACK) return false; }
+        return true;
+    }
+
     private void rotateLeft(RedBlackNode<T> node) {
         RedBlackNode<T> rightChild = node.getRightChild();
         super.rotateLeft(node, rightChild);
