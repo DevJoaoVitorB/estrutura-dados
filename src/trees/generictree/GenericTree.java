@@ -17,11 +17,11 @@ public class GenericTree<T> implements Tree<T, GenericNode<T>> {
     public int size(GenericNode<T> node) {
         if (node == null) return 0;
 
-        int contador = 1;
+        int count = 1;
         Iterator<GenericNode<T>> iterator = node.getChildren();
-        while(iterator.hasNext()) contador += size(iterator.next());
+        while(iterator.hasNext()) count += size(iterator.next());
 
-        return contador;
+        return count;
     }
 
     public boolean isEmpty() { return root == null; }

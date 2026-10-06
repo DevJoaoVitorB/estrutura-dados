@@ -79,14 +79,10 @@ public class RedBlackTree<T extends Comparable<T>> extends BinaryTree<T, RedBlac
         */
 
         // Situation 1 - Removed and Real Nodes are Red - OK!
-        if (isRed(removedNode, realNode)) { return; }
+        // Situation 2 - Removed Node is Red and Real Node is Black - Paint the Removed Node Black
+        if (isRed(removedNode, realNode) || isRed(removedNode) && isBlack(realNode)) { return; }
 
-        // Situation 2 - Removed Node is Red and Real Node is Black - Paint the Real Node Black
-        if (isRed(removedNode) && isBlack(realNode)) { realNode.setColor(Color.BLACK); return; }
-
-        // Situation 4 - Removed Node is Black and Real Node is Red - Paint the Real Node Red
-        if (isBlack(removedNode) && isRed(realNode)) { realNode.setColor(Color.RED); }
-
+        // Situation 4 - Removed Node is Black and Real Node is Red - Paint the Removed Node Red
         // Situation 3 - Removed and Real Node are Black
         RedBlackNode<T> current = parent;
         boolean isLeftChild = wasLeftChild;
@@ -104,7 +100,7 @@ public class RedBlackTree<T extends Comparable<T>> extends BinaryTree<T, RedBlac
                 ? brother.getRightChild()
                 : brother.getLeftChild();
 
-             // Case 2b - Brother and Nephews are Black, Parent is Red
+            // Case 2b - Brother and Nephews are Black, Parent is Red
             if (isRed(current) && isBlack(removedNode, brother, nearNephew, farNephew)) {
                 brother.setColor(Color.RED);
                 current.setColor(Color.BLACK);

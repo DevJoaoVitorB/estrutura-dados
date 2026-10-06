@@ -16,9 +16,5 @@ public interface Tree<T, N> {
     boolean isRoot(N node);
     int height(N node);
     int depth(N node);
-
-    // Traversal Methods
-    void preOrder();
-    void postOrder();
 }
 
